@@ -392,7 +392,17 @@
         hotels: 0, travel: 0, gas: 0, other: 0
       };
 
-      const optimizeSpending = () => {
+      const [cardSpending, setCardSpending] = useState(() => {
+        const initialPointValues = {
+          'Delta Platinum': 0.015, 'Delta Reserve': 0.015,
+          'United Quest': 0.015, 'United Club Infinite': 0.015,
+          'AA Platinum': 0.015, 'AA Executive': 0.015,
+          'Chase Sapphire Reserve': 0.020, 'Chase Sapphire Preferred': 0.018,
+          'Amex Gold': 0.020, 'Amex Platinum': 0.020,
+          'Capital One Venture X': 0.017, 'Capital One Venture': 0.017,
+          'Bilt Palladium': 0.022, 'Bilt Obsidian': 0.022, 'Bilt Blue': 0.022
+        };
+        
         const optimized = selectedCards.reduce((acc, card) => ({ ...acc, [card]: { ...initialSpending } }), {});
         
         // For each category, find the card with the highest return
@@ -407,7 +417,7 @@
               const isDisabled = category === 'rent' && !isBiltCard;
               
               if (!isDisabled) {
-                const returnRate = pointValues[card] * multiplier * 100;
+                const returnRate = initialPointValues[card] * multiplier * 100;
                 if (returnRate > bestReturn) {
                   bestReturn = returnRate;
                   bestCard = card;
@@ -423,9 +433,7 @@
         });
         
         return optimized;
-      };
-
-      const [cardSpending, setCardSpending] = useState(optimizeSpending());
+      });
 
       const updateCardSpending = (card, category, value) => {
         setCardSpending(prev => ({
