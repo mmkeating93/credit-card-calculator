@@ -244,18 +244,18 @@
     const CalculatorView = ({ selectedCards, onBack }) => {
       const benefitSuggestions = {
         'Delta Platinum': { hotel: 100, restaurant: 100, taxi: 60, streaming: 0, entertainment: 0, lounges: 0, eliteStatus: 150, travelCredit: 0, misc: 140 },
-        'Delta Reserve': { hotel: 100, restaurant: 100, taxi: 120, streaming: 0, entertainment: 0, lounges: 800, eliteStatus: 350, travelCredit: 0, misc: 150 },
+        'Delta Reserve': { hotel: 200, restaurant: 100, taxi: 120, streaming: 0, entertainment: 0, lounges: 800, eliteStatus: 350, travelCredit: 0, misc: 150 },
         'United Quest': { hotel: 0, restaurant: 0, taxi: 0, streaming: 0, entertainment: 0, lounges: 100, eliteStatus: 0, travelCredit: 0, misc: 120 },
         'United Club Infinite': { hotel: 0, restaurant: 0, taxi: 0, streaming: 0, entertainment: 0, lounges: 600, eliteStatus: 0, travelCredit: 0, misc: 120 },
         'AA Platinum': { hotel: 0, restaurant: 0, taxi: 0, streaming: 0, entertainment: 0, lounges: 0, eliteStatus: 0, travelCredit: 0, misc: 170 },
         'AA Executive': { hotel: 0, restaurant: 0, taxi: 0, streaming: 0, entertainment: 0, lounges: 600, eliteStatus: 0, travelCredit: 0, misc: 320 },
-        'Chase Sapphire Reserve': { hotel: 100, restaurant: 0, taxi: 0, streaming: 0, entertainment: 0, lounges: 500, eliteStatus: 0, travelCredit: 300, misc: 100 },
-        'Chase Sapphire Preferred': { hotel: 50, restaurant: 120, taxi: 0, streaming: 0, entertainment: 0, lounges: 50, eliteStatus: 0, travelCredit: 0, misc: 0 },
+        'Chase Sapphire Reserve': { hotel: 500, restaurant: 300, taxi: 0, streaming: 250, entertainment: 300, lounges: 500, eliteStatus: 0, travelCredit: 300, misc: 100 },
+        'Chase Sapphire Preferred': { hotel: 50, restaurant: 0, taxi: 0, streaming: 0, entertainment: 0, lounges: 50, eliteStatus: 0, travelCredit: 0, misc: 0 },
         'Amex Gold': { hotel: 0, restaurant: 120, taxi: 120, streaming: 0, entertainment: 0, lounges: 0, eliteStatus: 0, travelCredit: 0, misc: 0 },
         'Amex Platinum': { hotel: 200, restaurant: 0, taxi: 200, streaming: 0, entertainment: 340, lounges: 800, eliteStatus: 150, travelCredit: 200, misc: 20 },
         'Capital One Venture X': { hotel: 0, restaurant: 0, taxi: 0, streaming: 0, entertainment: 0, lounges: 400, eliteStatus: 50, travelCredit: 300, misc: 0 },
         'Capital One Venture': { hotel: 0, restaurant: 0, taxi: 0, streaming: 0, entertainment: 0, lounges: 0, eliteStatus: 0, travelCredit: 0, misc: 20 },
-        'Bilt Palladium': { hotel: 150, restaurant: 0, taxi: 0, streaming: 0, entertainment: 0, lounges: 200, eliteStatus: 0, travelCredit: 0, misc: 100 },
+        'Bilt Palladium': { hotel: 400, restaurant: 0, taxi: 0, streaming: 0, entertainment: 0, lounges: 200, eliteStatus: 0, travelCredit: 0, misc: 200 },
         'Bilt Obsidian': { hotel: 50, restaurant: 0, taxi: 0, streaming: 0, entertainment: 0, lounges: 0, eliteStatus: 0, travelCredit: 0, misc: 0 },
         'Bilt Blue': { hotel: 0, restaurant: 0, taxi: 0, streaming: 0, entertainment: 0, lounges: 0, eliteStatus: 0, travelCredit: 0, misc: 0 }
       };
@@ -391,7 +391,8 @@
                           const points = spending * multiplier;
                           const cashValue = points * pointValues[card];
                           const totalReturn = spending > 0 ? (cashValue / spending) * 100 : 0;
-                          const isDisabled = multiplier === 1;
+                          const isBiltCard = card.includes('Bilt');
+                          const isDisabled = category.key === 'rent' && !isBiltCard;;
                           
                           return (
                             <td key={`${card}-${category.key}`} className="p-2">
