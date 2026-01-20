@@ -108,8 +108,7 @@
                     onChange={(e) => {
                       setPassword(e.target.value);
                       setError('');
-                    const totalReturn = pointValues[card] * multiplier * 100;
-}}
+                    }}
                     placeholder="Enter code from purchase email"
                     className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-purple-500 focus:outline-none transition-colors"
                   />
@@ -245,18 +244,18 @@
     const CalculatorView = ({ selectedCards, onBack }) => {
       const benefitSuggestions = {
         'Delta Platinum': { hotel: 100, restaurant: 100, taxi: 60, streaming: 0, entertainment: 0, lounges: 0, eliteStatus: 150, travelCredit: 0, misc: 140 },
-        'Delta Reserve': { hotel: 200, restaurant: 100, taxi: 120, streaming: 0, entertainment: 0, lounges: 800, eliteStatus: 350, travelCredit: 0, misc: 150 },
+        'Delta Reserve': { hotel: 100, restaurant: 100, taxi: 120, streaming: 0, entertainment: 0, lounges: 800, eliteStatus: 350, travelCredit: 0, misc: 150 },
         'United Quest': { hotel: 0, restaurant: 0, taxi: 0, streaming: 0, entertainment: 0, lounges: 100, eliteStatus: 0, travelCredit: 0, misc: 120 },
         'United Club Infinite': { hotel: 0, restaurant: 0, taxi: 0, streaming: 0, entertainment: 0, lounges: 600, eliteStatus: 0, travelCredit: 0, misc: 120 },
         'AA Platinum': { hotel: 0, restaurant: 0, taxi: 0, streaming: 0, entertainment: 0, lounges: 0, eliteStatus: 0, travelCredit: 0, misc: 170 },
         'AA Executive': { hotel: 0, restaurant: 0, taxi: 0, streaming: 0, entertainment: 0, lounges: 600, eliteStatus: 0, travelCredit: 0, misc: 320 },
-        'Chase Sapphire Reserve': { hotel: 500, restaurant: 300, taxi: 0, streaming: 250, entertainment: 300, lounges: 500, eliteStatus: 0, travelCredit: 300, misc: 100 },
-        'Chase Sapphire Preferred': { hotel: 50, restaurant: 0, taxi: 0, streaming: 0, entertainment: 0, lounges: 50, eliteStatus: 0, travelCredit: 0, misc: 0 },
+        'Chase Sapphire Reserve': { hotel: 100, restaurant: 0, taxi: 0, streaming: 0, entertainment: 0, lounges: 500, eliteStatus: 0, travelCredit: 300, misc: 100 },
+        'Chase Sapphire Preferred': { hotel: 50, restaurant: 120, taxi: 0, streaming: 0, entertainment: 0, lounges: 50, eliteStatus: 0, travelCredit: 0, misc: 0 },
         'Amex Gold': { hotel: 0, restaurant: 120, taxi: 120, streaming: 0, entertainment: 0, lounges: 0, eliteStatus: 0, travelCredit: 0, misc: 0 },
         'Amex Platinum': { hotel: 200, restaurant: 0, taxi: 200, streaming: 0, entertainment: 340, lounges: 800, eliteStatus: 150, travelCredit: 200, misc: 20 },
         'Capital One Venture X': { hotel: 0, restaurant: 0, taxi: 0, streaming: 0, entertainment: 0, lounges: 400, eliteStatus: 50, travelCredit: 300, misc: 0 },
         'Capital One Venture': { hotel: 0, restaurant: 0, taxi: 0, streaming: 0, entertainment: 0, lounges: 0, eliteStatus: 0, travelCredit: 0, misc: 20 },
-        'Bilt Palladium': { hotel: 400, restaurant: 0, taxi: 0, streaming: 0, entertainment: 0, lounges: 200, eliteStatus: 0, travelCredit: 0, misc: 200 },
+        'Bilt Palladium': { hotel: 150, restaurant: 0, taxi: 0, streaming: 0, entertainment: 0, lounges: 200, eliteStatus: 0, travelCredit: 0, misc: 100 },
         'Bilt Obsidian': { hotel: 50, restaurant: 0, taxi: 0, streaming: 0, entertainment: 0, lounges: 0, eliteStatus: 0, travelCredit: 0, misc: 0 },
         'Bilt Blue': { hotel: 0, restaurant: 0, taxi: 0, streaming: 0, entertainment: 0, lounges: 0, eliteStatus: 0, travelCredit: 0, misc: 0 }
       };
@@ -360,6 +359,53 @@
 
             <div className="bg-white rounded-2xl shadow-xl p-8">
               <div className="mb-6">
+                <h2 className="hero-title text-3xl mb-2 text-gray-800">Point Values</h2>
+                <div className="text-sm text-gray-600 space-y-2">
+                  <p><strong>How to use this section:</strong></p>
+                  <ul className="list-disc ml-6 space-y-1">
+                    <li>Each card's points have a <strong>recommended cash value</strong> based on typical redemption rates</li>
+                    <li><strong>Adjust these values</strong> if you know you get better or worse value from your redemptions</li>
+                    <li>Examples: Transfer partners may yield 0.02-0.03, while statement credits are often just 0.01</li>
+                    <li>These values directly affect your return percentages in the spending table below</li>
+                  </ul>
+                </div>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm border-collapse">
+                  <thead>
+                    <tr className="border-b-2">
+                      <th className="text-left p-2 font-bold">Credit Card</th>
+                      <th className="text-center p-2 font-bold">Point Value (cents per point)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selectedCards.map(card => (
+                      <tr key={card} className="border-b hover:bg-purple-50">
+                        <td className="p-2 font-semibold">{card}</td>
+                        <td className="p-2">
+                          <div className="flex justify-center items-center gap-2">
+                            <input
+                              type="number"
+                              step="0.001"
+                              value={pointValues[card]}
+                              onChange={(e) => setPointValues(prev => ({
+                                ...prev,
+                                [card]: parseFloat(e.target.value) || 0
+                              }))}
+                              className="w-24 p-2 border-2 border-purple-200 rounded-lg text-center focus:border-purple-500 focus:outline-none"
+                            />
+                            <span className="text-gray-500">¢</span>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-xl p-8">
+              <div className="mb-6">
                 <h2 className="hero-title text-3xl mb-2 text-gray-800">Monthly Spending by Category</h2>
                 <p className="text-gray-600">Enter your monthly spending for each card. Only fill in categories you'd use that specific card for.</p>
               </div>
@@ -383,38 +429,49 @@
                       { key: 'travel', label: 'Travel (general)' },
                       { key: 'gas', label: 'Gas' },
                       { key: 'other', label: 'Other' }
-                    ].map(category => (
-                      <tr key={category.key} className="border-b hover:bg-purple-50">
-                        <td className="p-2 font-semibold sticky left-0 bg-white">{category.label}</td>
-                        {selectedCards.map(card => {
-                          const multiplier = cardRates[card][category.key];
-                          const spending = cardSpending[card][category.key];
-                          const points = spending * multiplier;
-                          const cashValue = points * pointValues[card];
-                          const totalReturn = pointValues[card] * multiplier * 100;
-                          const isBiltCard = card.includes('Bilt');
-                          const isDisabled = category.key === 'rent' && !isBiltCard;;
-                          
-                          return (
-                            <td key={`${card}-${category.key}`} className="p-2">
-                              <div className="flex flex-col gap-1">
-                                <div className={`text-xs text-center ${isDisabled ? 'text-gray-400' : 'text-purple-600 font-semibold'}`}>
-                                  {multiplier}x ({totalReturn.toFixed(1)}%)
+                    ].map(category => {
+                      // Calculate max return for this category across all cards
+                      const maxReturn = Math.max(...selectedCards.map(card => {
+                        const multiplier = cardRates[card][category.key];
+                        return pointValues[card] * multiplier * 100;
+                      }));
+                      
+                      return (
+                        <tr key={category.key} className="border-b hover:bg-purple-50">
+                          <td className="p-2 font-semibold sticky left-0 bg-white">{category.label}</td>
+                          {selectedCards.map(card => {
+                            const multiplier = cardRates[card][category.key];
+                            const spending = cardSpending[card][category.key];
+                            const points = spending * multiplier;
+                            const cashValue = points * pointValues[card];
+                            const totalReturn = pointValues[card] * multiplier * 100;
+                            // Only disable rent category for non-Bilt cards
+                            const isBiltCard = card.includes('Bilt');
+                            const isDisabled = category.key === 'rent' && !isBiltCard;
+                            // Check if this is the highest return for this category
+                            const isHighestReturn = totalReturn === maxReturn && !isDisabled;
+                            
+                            return (
+                              <td key={`${card}-${category.key}`} className="p-2">
+                                <div className="flex flex-col gap-1">
+                                  <div className={`text-xs text-center font-semibold ${isDisabled ? 'text-gray-400' : isHighestReturn ? 'text-green-600 bg-green-50 rounded px-1 py-0.5' : 'text-purple-600'}`}>
+                                    {multiplier}x ({totalReturn.toFixed(1)}%)
+                                  </div>
+                                  <input
+                                    type="number"
+                                    value={cardSpending[card][category.key]}
+                                    onChange={(e) => updateCardSpending(card, category.key, e.target.value)}
+                                    disabled={isDisabled}
+                                    className={`w-full p-2 border-2 rounded-lg text-center ${isDisabled ? 'bg-gray-100 cursor-not-allowed border-gray-200' : isHighestReturn ? 'border-green-400 focus:border-green-500 focus:outline-none' : 'border-purple-200 focus:border-purple-500 focus:outline-none'}`}
+                                    placeholder="$0"
+                                  />
                                 </div>
-                                <input
-                                  type="number"
-                                  value={cardSpending[card][category.key]}
-                                  onChange={(e) => updateCardSpending(card, category.key, e.target.value)}
-                                  disabled={isDisabled}
-                                  className={`w-full p-2 border-2 rounded-lg text-center ${isDisabled ? 'bg-gray-100 cursor-not-allowed border-gray-200' : 'border-purple-200 focus:border-purple-500 focus:outline-none'}`}
-                                  placeholder="$0"
-                                />
-                              </div>
-                            </td>
-                          );
-                        })}
-                      </tr>
-                    ))}
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
