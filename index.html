@@ -149,6 +149,10 @@
     const CreditCardPointsCalculator = () => {
       const [currentPage, setCurrentPage] = useState('selection');
       const [selectedCards, setSelectedCards] = useState([]);
+      const [totalSpending, setTotalSpending] = useState({
+        rent: 0, flights: 0, dining: 0, groceries: 0,
+        hotels: 0, travel: 0, gas: 0, other: 0
+      });
 
       const allCards = [
         { id: 'Delta Platinum', name: 'Delta Platinum', category: 'Delta' },
@@ -213,11 +217,11 @@
                 </div>
                 <div className="mt-8 flex gap-4 flex-wrap">
                   <button
-                    onClick={() => setCurrentPage('calculator')}
+                    onClick={() => setCurrentPage('spending-input')}
                     disabled={selectedCards.length === 0}
                     className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:shadow-lg disabled:bg-gray-300 disabled:cursor-not-allowed transition-all font-semibold"
                   >
-                    Continue to Calculator ({selectedCards.length} cards selected)
+                    Continue to Spending Input ({selectedCards.length} cards selected)
                   </button>
                   <button
                     onClick={() => setSelectedCards(allCards.map(c => c.id))}
@@ -238,10 +242,93 @@
         );
       }
 
-      return <CalculatorView selectedCards={selectedCards} onBack={() => setCurrentPage('selection')} />;
+      if (currentPage === 'spending-input') {
+        return <SpendingInputView selectedCards={selectedCards} totalSpending={totalSpending} setTotalSpending={setTotalSpending} onBack={() => setCurrentPage('selection')} onContinue={() => setCurrentPage('calculator')} />;
+      }
+
+      return <CalculatorView selectedCards={selectedCards} totalSpending={totalSpending} onBack={() => setCurrentPage('spending-input')} />;
     };
 
-    const CalculatorView = ({ selectedCards, onBack }) => {
+    const SpendingInputView = ({ selectedCards, totalSpending, setTotalSpending, onBack, onContinue }) => {
+      const updateSpending = (category, value) => {
+        setTotalSpending(prev => ({
+          ...prev,
+          [category]: parseFloat(value) || 0
+        }));
+      };
+
+      const categories = [
+        { key: 'rent', label: 'Rent/Mortgage', description: 'Monthly rent or mortgage payment' },
+        { key: 'flights', label: 'Flights', description: 'Airline tickets and flight purchases' },
+        { key: 'dining', label: 'Dining', description: 'Restaurants, takeout, delivery' },
+        { key: 'groceries', label: 'Groceries', description: 'Supermarkets and grocery stores' },
+        { key: 'hotels', label: 'Hotels', description: 'Hotel stays and accommodations' },
+        { key: 'travel', label: 'Travel (general)', description: 'Other travel expenses' },
+        { key: 'gas', label: 'Gas', description: 'Gas stations and fuel' },
+        { key: 'other', label: 'Other', description: 'All other purchases' }
+      ];
+
+      const totalMonthlySpend = Object.values(totalSpending).reduce((sum, val) => sum + val, 0);
+
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-purple-50 p-6">
+          <div className="w-full max-w-4xl mx-auto">
+            <button
+              onClick={onBack}
+              className="mb-4 px-4 py-2 bg-white rounded-lg shadow hover:shadow-md transition-shadow font-semibold text-purple-600"
+            >
+              ← Back to Card Selection
+            </button>
+
+            <div className="bg-white rounded-2xl shadow-xl p-8">
+              <div className="mb-6">
+                <h2 className="hero-title text-4xl mb-2 text-gray-800">Enter Your Monthly Spending</h2>
+                <p className="text-gray-600">Tell us how much you spend in each category per month. We'll optimize which card to use for each category based on the best returns.</p>
+              </div>
+
+              <div className="space-y-4">
+                {categories.map(category => (
+                  <div key={category.key} className="border-b pb-4 last:border-b-0">
+                    <label className="block mb-2">
+                      <span className="font-semibold text-gray-800">{category.label}</span>
+                      <span className="text-sm text-gray-500 ml-2">({category.description})</span>
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-500">$</span>
+                      <input
+                        type="number"
+                        value={totalSpending[category.key]}
+                        onChange={(e) => updateSpending(category.key, e.target.value)}
+                        className="flex-1 p-3 border-2 border-purple-200 rounded-lg focus:border-purple-500 focus:outline-none"
+                        placeholder="0"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-6 p-4 bg-purple-50 rounded-lg">
+                <div className="flex justify-between items-center">
+                  <span className="font-bold text-lg text-gray-800">Total Monthly Spending:</span>
+                  <span className="font-bold text-2xl text-purple-700">${totalMonthlySpend.toLocaleString()}</span>
+                </div>
+              </div>
+
+              <div className="mt-8 flex gap-4">
+                <button
+                  onClick={onContinue}
+                  className="flex-1 px-6 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:shadow-lg transition-all font-semibold text-lg"
+                >
+                  Continue to Optimized Strategy →
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    const CalculatorView = ({ selectedCards, totalSpending, onBack }) => {
       const benefitSuggestions = {
         'Delta Platinum': { hotel: 100, restaurant: 100, taxi: 60, streaming: 0, entertainment: 0, lounges: 0, eliteStatus: 150, travelCredit: 0, misc: 140 },
         'Delta Reserve': { hotel: 100, restaurant: 100, taxi: 120, streaming: 0, entertainment: 0, lounges: 800, eliteStatus: 350, travelCredit: 0, misc: 150 },
@@ -287,9 +374,40 @@
         hotels: 0, travel: 0, gas: 0, other: 0
       };
 
-      const [cardSpending, setCardSpending] = useState(
-        selectedCards.reduce((acc, card) => ({ ...acc, [card]: { ...initialSpending } }), {})
-      );
+      const optimizeSpending = () => {
+        const optimized = selectedCards.reduce((acc, card) => ({ ...acc, [card]: { ...initialSpending } }), {});
+        
+        // For each category, find the card with the highest return
+        Object.keys(initialSpending).forEach(category => {
+          if (totalSpending[category] > 0) {
+            let bestCard = null;
+            let bestReturn = -1;
+            
+            selectedCards.forEach(card => {
+              const multiplier = cardRates[card][category];
+              const isBiltCard = card.includes('Bilt');
+              const isDisabled = category === 'rent' && !isBiltCard;
+              
+              if (!isDisabled) {
+                const returnRate = pointValues[card] * multiplier * 100;
+                if (returnRate > bestReturn) {
+                  bestReturn = returnRate;
+                  bestCard = card;
+                }
+              }
+            });
+            
+            // Assign the spending to the best card for this category
+            if (bestCard) {
+              optimized[bestCard][category] = totalSpending[category];
+            }
+          }
+        });
+        
+        return optimized;
+      };
+
+      const [cardSpending, setCardSpending] = useState(optimizeSpending());
 
       const cardRates = {
         'Delta Platinum': { rent: 1, flights: 3, dining: 2, groceries: 2, hotels: 3, travel: 1, gas: 1, other: 1 },
@@ -420,58 +538,81 @@
                     </tr>
                   </thead>
                   <tbody>
-                    {[
-                      { key: 'rent', label: 'Rent' },
-                      { key: 'flights', label: 'Flights' },
-                      { key: 'dining', label: 'Dining' },
-                      { key: 'groceries', label: 'Groceries' },
-                      { key: 'hotels', label: 'Hotels' },
-                      { key: 'travel', label: 'Travel (general)' },
-                      { key: 'gas', label: 'Gas' },
-                      { key: 'other', label: 'Other' }
-                    ].map(category => {
-                      // Calculate max return for this category across all cards
-                      const maxReturn = Math.max(...selectedCards.map(card => {
-                        const multiplier = cardRates[card][category.key];
-                        return pointValues[card] * multiplier * 100;
-                      }));
+                    {(() => {
+                      // Calculate the absolute maximum return across all cards and categories
+                      const globalMaxReturn = Math.max(...[
+                        { key: 'rent', label: 'Rent' },
+                        { key: 'flights', label: 'Flights' },
+                        { key: 'dining', label: 'Dining' },
+                        { key: 'groceries', label: 'Groceries' },
+                        { key: 'hotels', label: 'Hotels' },
+                        { key: 'travel', label: 'Travel (general)' },
+                        { key: 'gas', label: 'Gas' },
+                        { key: 'other', label: 'Other' }
+                      ].flatMap(category => 
+                        selectedCards.map(card => {
+                          const multiplier = cardRates[card][category.key];
+                          const isBiltCard = card.includes('Bilt');
+                          const isDisabled = category.key === 'rent' && !isBiltCard;
+                          return isDisabled ? 0 : pointValues[card] * multiplier * 100;
+                        })
+                      ));
                       
-                      return (
-                        <tr key={category.key} className="border-b hover:bg-purple-50">
-                          <td className="p-2 font-semibold sticky left-0 bg-white">{category.label}</td>
-                          {selectedCards.map(card => {
-                            const multiplier = cardRates[card][category.key];
-                            const spending = cardSpending[card][category.key];
-                            const points = spending * multiplier;
-                            const cashValue = points * pointValues[card];
-                            const totalReturn = pointValues[card] * multiplier * 100;
-                            // Only disable rent category for non-Bilt cards
-                            const isBiltCard = card.includes('Bilt');
-                            const isDisabled = category.key === 'rent' && !isBiltCard;
-                            // Check if this is the highest return for this category
-                            const isHighestReturn = totalReturn === maxReturn && !isDisabled;
-                            
-                            return (
-                              <td key={`${card}-${category.key}`} className="p-2">
-                                <div className="flex flex-col gap-1">
-                                  <div className={`text-xs text-center font-semibold ${isDisabled ? 'text-gray-400' : isHighestReturn ? 'text-green-600 bg-green-50 rounded px-1 py-0.5' : 'text-purple-600'}`}>
-                                    {multiplier}x ({totalReturn.toFixed(1)}%)
+                      return [
+                        { key: 'rent', label: 'Rent' },
+                        { key: 'flights', label: 'Flights' },
+                        { key: 'dining', label: 'Dining' },
+                        { key: 'groceries', label: 'Groceries' },
+                        { key: 'hotels', label: 'Hotels' },
+                        { key: 'travel', label: 'Travel (general)' },
+                        { key: 'gas', label: 'Gas' },
+                        { key: 'other', label: 'Other' }
+                      ].map(category => {
+                        // Calculate max return for this category across all cards
+                        const maxReturn = Math.max(...selectedCards.map(card => {
+                          const multiplier = cardRates[card][category.key];
+                          return pointValues[card] * multiplier * 100;
+                        }));
+                        
+                        return (
+                          <tr key={category.key} className="border-b hover:bg-purple-50">
+                            <td className="p-2 font-semibold sticky left-0 bg-white">{category.label}</td>
+                            {selectedCards.map(card => {
+                              const multiplier = cardRates[card][category.key];
+                              const spending = cardSpending[card][category.key];
+                              const points = spending * multiplier;
+                              const cashValue = points * pointValues[card];
+                              const totalReturn = pointValues[card] * multiplier * 100;
+                              // Only disable rent category for non-Bilt cards
+                              const isBiltCard = card.includes('Bilt');
+                              const isDisabled = category.key === 'rent' && !isBiltCard;
+                              // Check if this is the highest return for this category
+                              const isHighestReturn = totalReturn === maxReturn && !isDisabled;
+                              // Check if this is the absolute highest return across everything
+                              const isGlobalMax = totalReturn === globalMaxReturn && !isDisabled;
+                              
+                              return (
+                                <td key={`${card}-${category.key}`} className="p-2">
+                                  <div className="flex flex-col gap-1">
+                                    <div className={`text-xs text-center font-semibold ${isDisabled ? 'text-gray-400' : isGlobalMax ? 'text-yellow-700 bg-yellow-100 rounded px-1 py-0.5 ring-2 ring-yellow-400' : isHighestReturn ? 'text-green-600 bg-green-50 rounded px-1 py-0.5' : 'text-purple-600'}`}>
+                                      {multiplier}x ({totalReturn.toFixed(1)}%)
+                                    </div>
+                                    <input
+                                      type="number"
+                                      value={cardSpending[card][category.key]}
+                                      onChange={(e) => updateCardSpending(card, category.key, e.target.value)}
+                                      disabled={isDisabled}
+                                      className={`w-full p-2 border-2 rounded-lg text-center ${isDisabled ? 'bg-gray-100 cursor-not-allowed border-gray-200' : isGlobalMax ? 'border-yellow-400 focus:border-yellow-500 focus:outline-none bg-yellow-50' : isHighestReturn ? 'border-green-400 focus:border-green-500 focus:outline-none' : 'border-purple-200 focus:border-purple-500 focus:outline-none'}`}
+                                      placeholder="$0"
+                                    />
                                   </div>
-                                  <input
-                                    type="number"
-                                    value={cardSpending[card][category.key]}
-                                    onChange={(e) => updateCardSpending(card, category.key, e.target.value)}
-                                    disabled={isDisabled}
-                                    className={`w-full p-2 border-2 rounded-lg text-center ${isDisabled ? 'bg-gray-100 cursor-not-allowed border-gray-200' : isHighestReturn ? 'border-green-400 focus:border-green-500 focus:outline-none' : 'border-purple-200 focus:border-purple-500 focus:outline-none'}`}
-                                    placeholder="$0"
-                                  />
-                                </div>
-                              </td>
-                            );
-                          })}
-                        </tr>
-                      );
-                    })}
+                                </td>
+                              );
+                            })}
+                          </tr>
+                        );
+                      });
+                    })()}
                   </tbody>
                 </table>
               </div>
