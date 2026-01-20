@@ -108,7 +108,8 @@
                     onChange={(e) => {
                       setPassword(e.target.value);
                       setError('');
-                    }}
+                    const totalReturn = pointValues[card] * multiplier * 100;
+}}
                     placeholder="Enter code from purchase email"
                     className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-purple-500 focus:outline-none transition-colors"
                   />
@@ -390,7 +391,7 @@
                           const spending = cardSpending[card][category.key];
                           const points = spending * multiplier;
                           const cashValue = points * pointValues[card];
-                          const totalReturn = spending > 0 ? (cashValue / spending) * 100 : 0;
+                          const totalReturn = pointValues[card] * multiplier * 100;
                           const isBiltCard = card.includes('Bilt');
                           const isDisabled = category.key === 'rent' && !isBiltCard;;
                           
