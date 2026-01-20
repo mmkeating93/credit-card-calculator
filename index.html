@@ -369,6 +369,24 @@
         'Bilt Palladium': 0.022, 'Bilt Obsidian': 0.022, 'Bilt Blue': 0.022
       });
 
+      const cardRates = {
+        'Delta Platinum': { rent: 1, flights: 3, dining: 2, groceries: 2, hotels: 3, travel: 1, gas: 1, other: 1 },
+        'Delta Reserve': { rent: 1, flights: 3, dining: 2, groceries: 2, hotels: 3, travel: 1, gas: 1, other: 1 },
+        'United Quest': { rent: 1, flights: 3, dining: 2, groceries: 1, hotels: 1, travel: 1, gas: 1, other: 1 },
+        'United Club Infinite': { rent: 1, flights: 4, dining: 2, groceries: 1, hotels: 1, travel: 1, gas: 1, other: 1 },
+        'AA Platinum': { rent: 1, flights: 2, dining: 1, groceries: 1, hotels: 1, travel: 1, gas: 1, other: 1 },
+        'AA Executive': { rent: 1, flights: 2, dining: 1, groceries: 1, hotels: 1, travel: 1, gas: 1, other: 1 },
+        'Chase Sapphire Reserve': { rent: 1, flights: 3, dining: 3, groceries: 1, hotels: 3, travel: 3, gas: 1, other: 1 },
+        'Chase Sapphire Preferred': { rent: 1, flights: 2, dining: 3, groceries: 1, hotels: 2, travel: 2, gas: 1, other: 1 },
+        'Amex Gold': { rent: 1, flights: 3, dining: 4, groceries: 4, hotels: 1, travel: 1, gas: 1, other: 1 },
+        'Amex Platinum': { rent: 1, flights: 5, dining: 1, groceries: 1, hotels: 5, travel: 1, gas: 1, other: 1 },
+        'Capital One Venture X': { rent: 1, flights: 5, dining: 2, groceries: 1, hotels: 5, travel: 2, gas: 1, other: 1 },
+        'Capital One Venture': { rent: 1, flights: 2, dining: 1, groceries: 1, hotels: 2, travel: 1, gas: 1, other: 1 },
+        'Bilt Palladium': { rent: 3, flights: 2, dining: 3, groceries: 1, hotels: 2, travel: 2, gas: 1, other: 1 },
+        'Bilt Obsidian': { rent: 2, flights: 2, dining: 3, groceries: 1, hotels: 2, travel: 2, gas: 1, other: 1 },
+        'Bilt Blue': { rent: 1, flights: 2, dining: 3, groceries: 1, hotels: 2, travel: 2, gas: 1, other: 1 }
+      };
+
       const initialSpending = {
         rent: 0, flights: 0, dining: 0, groceries: 0,
         hotels: 0, travel: 0, gas: 0, other: 0
@@ -408,24 +426,6 @@
       };
 
       const [cardSpending, setCardSpending] = useState(optimizeSpending());
-
-      const cardRates = {
-        'Delta Platinum': { rent: 1, flights: 3, dining: 2, groceries: 2, hotels: 3, travel: 1, gas: 1, other: 1 },
-        'Delta Reserve': { rent: 1, flights: 3, dining: 2, groceries: 2, hotels: 3, travel: 1, gas: 1, other: 1 },
-        'United Quest': { rent: 1, flights: 3, dining: 2, groceries: 1, hotels: 1, travel: 1, gas: 1, other: 1 },
-        'United Club Infinite': { rent: 1, flights: 4, dining: 2, groceries: 1, hotels: 1, travel: 1, gas: 1, other: 1 },
-        'AA Platinum': { rent: 1, flights: 2, dining: 1, groceries: 1, hotels: 1, travel: 1, gas: 1, other: 1 },
-        'AA Executive': { rent: 1, flights: 2, dining: 1, groceries: 1, hotels: 1, travel: 1, gas: 1, other: 1 },
-        'Chase Sapphire Reserve': { rent: 1, flights: 3, dining: 3, groceries: 1, hotels: 3, travel: 3, gas: 1, other: 1 },
-        'Chase Sapphire Preferred': { rent: 1, flights: 2, dining: 3, groceries: 1, hotels: 2, travel: 2, gas: 1, other: 1 },
-        'Amex Gold': { rent: 1, flights: 3, dining: 4, groceries: 4, hotels: 1, travel: 1, gas: 1, other: 1 },
-        'Amex Platinum': { rent: 1, flights: 5, dining: 1, groceries: 1, hotels: 5, travel: 1, gas: 1, other: 1 },
-        'Capital One Venture X': { rent: 1, flights: 5, dining: 2, groceries: 1, hotels: 5, travel: 2, gas: 1, other: 1 },
-        'Capital One Venture': { rent: 1, flights: 2, dining: 1, groceries: 1, hotels: 2, travel: 1, gas: 1, other: 1 },
-        'Bilt Palladium': { rent: 3, flights: 2, dining: 3, groceries: 1, hotels: 2, travel: 2, gas: 1, other: 1 },
-        'Bilt Obsidian': { rent: 2, flights: 2, dining: 3, groceries: 1, hotels: 2, travel: 2, gas: 1, other: 1 },
-        'Bilt Blue': { rent: 1, flights: 2, dining: 3, groceries: 1, hotels: 2, travel: 2, gas: 1, other: 1 }
-      };
 
       const updateCardSpending = (card, category, value) => {
         setCardSpending(prev => ({
